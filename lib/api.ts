@@ -98,3 +98,26 @@ export type CreateRequestPayload = {
   longitude?: number;
   isLocationRestricted?: boolean;
 };
+
+export type ReplyStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'WITHDRAWN';
+
+export type Reply = {
+  id: string;
+  requestId: string;
+  responderId: string;
+  message: string;
+  status: ReplyStatus;
+  offeredPrice?: number | null;
+  createdAt: string;
+  responder?: {
+    id: string;
+    name: string | null;
+    email?: string;
+    image?: string | null;
+  } | null;
+  product?: {
+    id: string;
+    title: string;
+    images?: string[];
+  } | null;
+};

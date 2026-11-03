@@ -18,27 +18,10 @@ export async function generateMetadata({ params }: Params) {
     return {
       title: r.title,
       description: (r.description || '').slice(0, 160),
-      openGraph: {
-        title: r.title,
-        description: (r.description || '').slice(0, 160),
-        type: 'article',
-      },
     };
   } catch {
     return { title: 'Request' };
   }
-}
-
-function normalizeImages(raw: unknown): string[] {
-  if (Array.isArray(raw)) {
-    return raw.filter(
-      (x): x is string => typeof x === 'string' && x.trim().length > 0,
-    );
-  }
-  if (typeof raw === 'string' && raw.trim().length > 0) {
-    return [raw.trim()];
-  }
-  return [];
 }
 
 export default async function RequestDetailPage({ params }: Params) {
@@ -46,17 +29,43 @@ export default async function RequestDetailPage({ params }: Params) {
   const token = await getAccessToken();
 
   let request: Request | null = null;
+  let needsAuth = false;
   try {
     request = await apiFetch<Request>(`/requests/${id}`, { token });
   } catch (e: unknown) {
     const status = (e as { status?: number })?.status;
     if (status === 404) notFound();
+    if (status === 401) needsAuth = true;
+    else {
+      return (
+        <main className="min-h-screen bg-white flex items-center justify-center">
+          <div className="text-center px-6">
+            <p className="text-ink-muted mb-4">Could not load this request.</p>
+            <Link href="/browse" className="text-primary font-semibold">
+              ← Back to board
+            </Link>
+          </div>
+        </main>
+      );
+    }
+  }
+
+  if (needsAuth || !request) {
     return (
-      <main className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-ink-muted mb-4">Could not load this request.</p>
-          <Link href="/browse" className="text-primary font-semibold">
-            ← Back to board
+      <main className="min-h-screen bg-white flex items-center justify-center px-6">
+        <div className="text-center max-w-sm">
+          <div className="text-5xl mb-4">🔐</div>
+          <h1 className="text-xl font-bold text-ink mb-2">
+            Sign in to view this request
+          </h1>
+          <p className="text-ink-muted mb-6">
+            The board is available to registered members.
+          </p>
+          <Link
+            href={`/auth/login?next=/browse/${id}`}
+            className="inline-block bg-primary hover:bg-primary-dark text-white font-bold px-6 py-3 rounded-full transition"
+          >
+            Continue with Google
           </Link>
         </div>
       </main>
@@ -66,60 +75,25 @@ export default async function RequestDetailPage({ params }: Params) {
   const responses = request.responses ?? [];
   const status = request.status ?? 'OPEN';
   const isAuthor = request.isAuthor === true;
-  const canRespond =
-    request.canRespond ??
-    (!isAuthor && status === 'OPEN' && responses.length === 0);
-  const canAccept =
-    request.canAccept ??
-    (isAuthor && status === 'OPEN' && responses.length > 0);
-
-  const images = normalizeImages((request as { images?: unknown }).images);
+  const canRespond = request.canRespond === true;
+  const canAccept = request.canAccept === true;
+  const myOfferId = request.myOfferId ?? null;
+  const images = Array.isArray(request.images) ? request.images : [];
   const specs = request.specifications ?? {};
-
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Demand',
-    name: request.title,
-    description: request.description,
-    datePosted: request.createdAt,
-    ...(request.budgetMin || request.budgetMax
-      ? {
-          priceSpecification: {
-            '@type': 'PriceSpecification',
-            priceCurrency: 'ETB',
-            minPrice: request.budgetMin ?? undefined,
-            maxPrice: request.budgetMax ?? undefined,
-          },
-        }
-      : {}),
-    ...(request.location
-      ? {
-          availableAtOrFrom: {
-            '@type': 'Place',
-            name: request.location,
-          },
-        }
-      : {}),
-  };
 
   return (
     <main className="min-h-screen bg-white">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
       <nav className="sticky top-0 z-50 bg-white border-b border-border">
         <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link
             href="/browse"
-            className="text-sm font-semibold text-ink-muted hover:text-primary transition"
+            className="text-sm font-semibold text-ink-muted hover:text-primary"
           >
             ← Back to board
           </Link>
           <Link
             href="/dashboard"
-            className="text-sm font-semibold text-ink-muted hover:text-primary transition"
+            className="text-sm font-semibold text-ink-muted hover:text-primary"
           >
             Dashboard
           </Link>
@@ -127,7 +101,6 @@ export default async function RequestDetailPage({ params }: Params) {
       </nav>
 
       <article className="max-w-4xl mx-auto px-6 py-10">
-        {/* Top chips: category / type / status / date */}
         <div className="flex flex-wrap items-center gap-2 mb-4">
           {request.category && (
             <span className="inline-flex items-center gap-1 text-xs font-bold text-primary bg-primary-light px-2 py-1 rounded-md">
@@ -155,7 +128,6 @@ export default async function RequestDetailPage({ params }: Params) {
           </p>
         )}
 
-        {/* Image gallery — click opens full size in a new tab */}
         {images.length > 0 && (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
             {images.map((src, i) => (
@@ -178,7 +150,6 @@ export default async function RequestDetailPage({ params }: Params) {
           </div>
         )}
 
-        {/* Specifications */}
         {Object.keys(specs).length > 0 && (
           <div className="flex flex-wrap gap-2 mb-6">
             {Object.entries(specs).map(([k, v]) => (
@@ -192,7 +163,6 @@ export default async function RequestDetailPage({ params }: Params) {
           </div>
         )}
 
-        {/* Budget + Location */}
         <div className="grid sm:grid-cols-2 gap-4 mb-8">
           {(request.budgetMin != null || request.budgetMax != null) && (
             <div className="bg-primary-light/40 rounded-xl p-4">
@@ -200,7 +170,7 @@ export default async function RequestDetailPage({ params }: Params) {
                 Budget
               </div>
               <div className="text-lg font-black text-ink">
-                {formatBudget(request.budgetMin ?? null, request.budgetMax ?? null)}
+                {formatBudget(request.budgetMin, request.budgetMax)}
               </div>
             </div>
           )}
@@ -216,7 +186,6 @@ export default async function RequestDetailPage({ params }: Params) {
           )}
         </div>
 
-        {/* Author line */}
         <p className="text-sm text-ink-muted mb-6">
           Posted by{' '}
           <strong className="text-ink">
@@ -224,7 +193,6 @@ export default async function RequestDetailPage({ params }: Params) {
           </strong>
         </p>
 
-        {/* CLOSED banner */}
         {status === 'CLOSED' && (
           <div className="bg-green-50 border border-green-200 rounded-xl p-3 mb-6 flex items-start gap-2">
             <span className="text-green-700 shrink-0">✓</span>
@@ -235,7 +203,7 @@ export default async function RequestDetailPage({ params }: Params) {
         )}
 
         <div className="border-t border-border pt-6">
-          {/* AUTHOR VIEW: reply list with Accept */}
+          {/* ── AUTHOR: reply list with Accept ── */}
           {isAuthor && (
             <section>
               <div className="flex items-center justify-between mb-3">
@@ -264,6 +232,7 @@ export default async function RequestDetailPage({ params }: Params) {
                         reply={rep}
                         requestId={request!.id}
                         isAuthor
+                        canAccept={canAccept}
                       />
                     </li>
                   ))}
@@ -272,18 +241,29 @@ export default async function RequestDetailPage({ params }: Params) {
             </section>
           )}
 
-          {/* NON-AUTHOR VIEW */}
+          {/* ── NON-AUTHOR ── */}
           {!isAuthor && (
             <section>
-              {!token ? (
-                status === 'OPEN' && (
+              {myOfferId ? (
+                <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-4">
+                  <p className="text-sm font-semibold text-green-800 mb-3">
+                    🎉 Your reply was accepted. Chat with the requester to
+                    finalize the deal.
+                  </p>
                   <Link
-                    href={`/auth/login?next=/browse/${request.id}`}
-                    className="inline-block bg-primary hover:bg-primary-dark text-white font-bold px-6 py-3 rounded-full transition"
+                    href={`/chat/${myOfferId}`}
+                    className="inline-block bg-primary hover:bg-primary-dark text-white font-bold px-5 py-2.5 rounded-full transition"
                   >
-                    Sign in to reply
+                    Open chat
                   </Link>
-                )
+                </div>
+              ) : canRespond ? (
+                <>
+                  <h2 className="text-lg font-black text-ink mb-3">
+                    Respond to this request
+                  </h2>
+                  <ReplyForm requestId={request.id} />
+                </>
               ) : responses.length > 0 ? (
                 <>
                   <h2 className="text-lg font-black text-ink mb-3">
@@ -296,18 +276,17 @@ export default async function RequestDetailPage({ params }: Params) {
                           reply={rep}
                           requestId={request!.id}
                           isAuthor={false}
+                          canAccept={false}
                         />
                       </li>
                     ))}
                   </ul>
                 </>
-              ) : canRespond ? (
-                <>
-                  <h2 className="text-lg font-black text-ink mb-3">
-                    Respond to this request
-                  </h2>
-                  <ReplyForm requestId={request.id} />
-                </>
+              ) : status !== 'OPEN' ? (
+                <p className="text-sm text-ink-muted">
+                  This request is {status.toLowerCase()}. You can no longer
+                  reply.
+                </p>
               ) : null}
             </section>
           )}
@@ -325,10 +304,7 @@ function StatusChip({ status }: { status: string }) {
     EXPIRED: { label: 'Expired', cls: 'bg-gray-100 text-gray-600' },
     CANCELLED: { label: 'Cancelled', cls: 'bg-gray-100 text-gray-600' },
   };
-  const c = map[status] ?? {
-    label: status,
-    cls: 'bg-gray-100 text-gray-600',
-  };
+  const c = map[status] ?? { label: status, cls: 'bg-gray-100 text-gray-600' };
   return (
     <span
       className={`inline-flex items-center text-xs font-bold px-2 py-1 rounded-md ${c.cls}`}
@@ -342,16 +318,20 @@ function ReplyTile({
   reply,
   requestId,
   isAuthor,
+  canAccept,
 }: {
   reply: Reply;
   requestId: string;
   isAuthor: boolean;
+  canAccept: boolean;
 }) {
   const isPending = reply.status === 'PENDING';
+  const isAccepted = reply.status === 'ACCEPTED';
+
   return (
     <div
       className={`border rounded-xl p-4 ${
-        reply.status === 'ACCEPTED'
+        isAccepted
           ? 'border-green-600/60 ring-1 ring-green-600/20'
           : 'border-border'
       }`}
@@ -376,7 +356,7 @@ function ReplyTile({
           {reply.status !== 'PENDING' && (
             <span
               className={`inline-block mt-1 text-[10px] font-bold px-1.5 py-0.5 rounded ${
-                reply.status === 'ACCEPTED'
+                isAccepted
                   ? 'bg-green-100 text-green-800'
                   : 'bg-gray-100 text-gray-600'
               }`}
@@ -391,7 +371,7 @@ function ReplyTile({
         {reply.message}
       </p>
 
-      {isPending && (
+      {isPending && (isAuthor ? canAccept : !isAuthor) && (
         <ReplyActions
           requestId={requestId}
           replyId={reply.id}
