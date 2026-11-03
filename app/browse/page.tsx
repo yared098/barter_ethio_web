@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { apiFetch, RequestList, ApiError } from '@/lib/api';
+import { apiFetch, RequestList } from '@/lib/api';
 import { getAccessToken } from '@/lib/auth';
 import { RequestCard } from '@/components/request-card';
 
@@ -28,17 +28,12 @@ export default async function BrowsePage({
   });
 
   let data: RequestList | null = null;
-  let needsAuth = false;
   let errorMsg: string | null = null;
 
   try {
     data = await apiFetch<RequestList>(`/requests?${qs}`, { token });
   } catch (e: unknown) {
-    if (e instanceof ApiError && e.status === 401) {
-      needsAuth = true;
-    } else {
-      errorMsg = e instanceof Error ? e.message : 'Could not load board';
-    }
+    errorMsg = e instanceof Error ? e.message : 'Could not load board';
   }
 
   return (
@@ -79,27 +74,12 @@ export default async function BrowsePage({
           <p className="text-ink-muted">What people are looking for right now.</p>
         </div>
 
-        {needsAuth && (
-          <div className="bg-primary-light border border-primary/30 rounded-2xl p-8 text-center">
-            <div className="text-5xl mb-4">🔐</div>
-            <h2 className="text-xl font-bold text-ink mb-2">
-              Sign in to see the board
-            </h2>
-            <p className="text-ink-muted mb-6">
-              The wanted board is available to registered members.
-            </p>
-            <Link
-              href="/auth/login?next=/browse"
-              className="inline-block bg-primary hover:bg-primary-dark text-white font-bold px-6 py-3 rounded-full transition"
-            >
-              Continue with Google
-            </Link>
-          </div>
-        )}
-
         {errorMsg && (
-          <div className="bg-red-50 border border-red-200 text-red-800 rounded-xl p-4 mb-6 text-sm">
-            {errorMsg}
+          <div
+            role="alert"
+            className="bg-red-50 border border-red-200 text-red-800 rounded-xl p-4 mb-6 text-sm"
+          >
+            The wanted board could not be loaded. {errorMsg}
           </div>
         )}
 

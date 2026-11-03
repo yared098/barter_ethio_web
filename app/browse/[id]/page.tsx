@@ -38,48 +38,26 @@ export default async function RequestDetailPage({ params }: Params) {
   const token = await getAccessToken();
 
   let request: RequestDetails | null = null;
-  let needsAuth = false;
   try {
     request = await apiFetch<RequestDetails>(`/requests/${id}`, { token });
   } catch (e: unknown) {
     const status = (e as { status?: number })?.status;
     if (status === 404) notFound();
-    if (status === 401) needsAuth = true;
-    else {
-      return (
-        <main className="min-h-screen bg-white flex items-center justify-center">
-          <div className="text-center px-6">
-            <p className="text-ink-muted mb-4">Could not load this request.</p>
-            <Link href="/browse" className="text-primary font-semibold">
-              ← Back to board
-            </Link>
-          </div>
-        </main>
-      );
-    }
-  }
-
-  if (needsAuth || !request) {
     return (
-      <main className="min-h-screen bg-white flex items-center justify-center px-6">
-        <div className="text-center max-w-sm">
-          <div className="text-5xl mb-4">🔐</div>
-          <h1 className="text-xl font-bold text-ink mb-2">
-            Sign in to view this request
-          </h1>
-          <p className="text-ink-muted mb-6">
-            The board is available to registered members.
+      <main className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center px-6">
+          <p className="text-ink-muted mb-4">
+            This request could not be loaded right now.
           </p>
-          <Link
-            href={`/auth/login?next=/browse/${id}`}
-            className="inline-block bg-primary hover:bg-primary-dark text-white font-bold px-6 py-3 rounded-full transition"
-          >
-            Continue with Google
+          <Link href="/browse" className="text-primary font-semibold">
+            ← Back to board
           </Link>
         </div>
       </main>
     );
   }
+
+  if (!request) notFound();
 
   const responses = request.responses ?? [];
   const status = request.status ?? 'OPEN';
@@ -103,12 +81,21 @@ export default async function RequestDetailPage({ params }: Params) {
           >
             ← Back to board
           </Link>
-          <Link
-            href="/dashboard"
-            className="text-sm font-semibold text-ink-muted hover:text-primary"
-          >
-            Dashboard
-          </Link>
+          {token ? (
+            <Link
+              href="/dashboard"
+              className="text-sm font-semibold text-ink-muted hover:text-primary"
+            >
+              Dashboard
+            </Link>
+          ) : (
+            <Link
+              href={`/auth/login?next=/browse/${id}`}
+              className="text-sm font-semibold text-ink-muted hover:text-primary"
+            >
+              Sign in
+            </Link>
+          )}
         </div>
       </nav>
 
@@ -267,6 +254,22 @@ export default async function RequestDetailPage({ params }: Params) {
                     className="inline-block bg-primary hover:bg-primary-dark text-white font-bold px-5 py-2.5 rounded-full transition"
                   >
                     Open chat
+                  </Link>
+                </div>
+              ) : status === 'OPEN' && !token ? (
+                <div className="rounded-xl border border-primary/20 bg-primary-light/50 p-5">
+                  <h2 className="text-lg font-black text-ink mb-2">
+                    Have something to offer?
+                  </h2>
+                  <p className="text-sm text-ink-muted mb-4">
+                    Sign in to reply to this request. You can browse the board
+                    and view request details without an account.
+                  </p>
+                  <Link
+                    href={`/auth/login?next=/browse/${id}`}
+                    className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-5 py-2.5 text-sm font-bold text-white transition hover:bg-primary-dark"
+                  >
+                    Sign in to reply
                   </Link>
                 </div>
               ) : canRespond ? (
