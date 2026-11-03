@@ -36,6 +36,10 @@ export function RequestCard({ request }: { request: Request }) {
           {request.title}
         </h3>
 
+        <p className="text-xs text-ink-subtle mb-2">
+          Posted by {request.author?.name || 'Anonymous'}
+        </p>
+
         <p className="text-sm text-ink-muted leading-relaxed line-clamp-2 mb-3">
           {request.description}
         </p>
