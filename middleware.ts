@@ -9,7 +9,8 @@ export function middleware(req: NextRequest) {
   const isProtected = PROTECTED.some(
     (p) => pathname === p || pathname.startsWith(p + '/'),
   );
-  if (!isProtected) return NextResponse.next();
+  const isOfferChat = /^\/chat\/[^/]+$/.test(pathname);
+  if (!isProtected || isOfferChat) return NextResponse.next();
 
   const token = req.cookies.get(ACCESS_COOKIE)?.value;
   if (!token) {

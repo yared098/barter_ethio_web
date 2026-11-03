@@ -3,6 +3,7 @@ import { apiFetch } from '@/lib/api';
 import { getCurrentUser, getAccessToken } from '@/lib/auth';
 import type { ChatOffer } from '@/lib/chat';
 import { ChatDetail } from '@/components/chat-detail';
+import { TelegramChatGate } from '@/components/telegram-chat-gate';
 
 type Params = { params: Promise<{ offerId: string }> };
 
@@ -29,7 +30,7 @@ export default async function ChatDetailPage({ params }: Params) {
   const { offerId } = await params;
 
   const user = await getCurrentUser();
-  if (!user) redirect(`/auth/login?next=/chat/${offerId}`);
+  if (!user) return <TelegramChatGate offerId={offerId} />;
 
   const token = await getAccessToken();
 

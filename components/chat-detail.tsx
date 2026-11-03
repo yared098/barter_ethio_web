@@ -17,6 +17,7 @@ import { resolveImage } from '@/lib/utils';
 type Props = {
   initialOffer: ChatOffer;
   meId: string;
+  telegramApp?: boolean;
 };
 
 /** "Today" / "Yesterday" / "Monday" / "Oct 15" */
@@ -72,7 +73,11 @@ const STATUS_TONE: Record<string, { bg: string; text: string; label: string }> =
   },
 };
 
-export function ChatDetail({ initialOffer, meId }: Props) {
+export function ChatDetail({
+  initialOffer,
+  meId,
+  telegramApp = false,
+}: Props) {
   const router = useRouter();
   const [offer, setOffer] = useState<ChatOffer>(initialOffer);
   const [messages, setMessages] = useState<ChatMessage[]>(
@@ -311,24 +316,45 @@ export function ChatDetail({ initialOffer, meId }: Props) {
       {/* ═══════════ HEADER ═══════════ */}
       <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
         <div className="max-w-3xl mx-auto px-2 sm:px-3 h-16 flex items-center gap-2.5">
-          <Link
-            href="/chat"
-            className="flex items-center justify-center w-9 h-9 rounded-full text-slate-600 hover:bg-slate-100 hover:text-primary transition flex-shrink-0"
-            aria-label="Back"
-          >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
+          {telegramApp ? (
+            <button
+              type="button"
+              onClick={() => window.Telegram?.WebApp?.close()}
+              className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-slate-600 transition hover:bg-slate-100 hover:text-primary"
+              aria-label="Close chat"
             >
-              <path d="M19 12H5M12 19l-7-7 7-7" />
-            </svg>
-          </Link>
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+              >
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            </button>
+          ) : (
+            <Link
+              href="/chat"
+              className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full text-slate-600 transition hover:bg-slate-100 hover:text-primary"
+              aria-label="Back"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+              </svg>
+            </Link>
+          )}
 
           <div className="relative flex-shrink-0">
             <UserAvatar name={other.name} image={other.image} size={40} />
