@@ -2,16 +2,25 @@ import Link from 'next/link';
 import { Request } from '@/lib/api';
 import { formatBudget, relativeDate, resolveImage } from '@/lib/utils';
 
-export function RequestCard({ request }: { request: Request }) {
+export function RequestCard({
+  request,
+  currentUserId,
+}: {
+  request: Request;
+  currentUserId?: string;
+}) {
   const image = resolveImage(request.images?.[0]);
+  const isOwnRequest =
+    currentUserId != null && request.authorId === currentUserId;
+  const replyCount = request._count?.responses ?? 0;
 
   return (
     <Link
       href={`/browse/${request.id}`}
-      className="group block bg-white border border-border rounded-2xl overflow-hidden hover:border-primary/40 hover:shadow-md transition"
+      className="group flex h-full min-w-0 flex-col overflow-hidden rounded-2xl border border-border bg-white transition hover:border-primary/40 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
     >
       {image && (
-        <div className="aspect-[16/9] bg-primary-light overflow-hidden">
+        <div className="aspect-[16/9] overflow-hidden bg-primary-light">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={image}
@@ -22,34 +31,47 @@ export function RequestCard({ request }: { request: Request }) {
         </div>
       )}
 
-      <div className="p-5">
-        <div className="flex items-start justify-between gap-3 mb-2">
-          <span className="inline-flex items-center gap-1 text-xs font-bold text-primary bg-primary-light px-2 py-0.5 rounded-md">
+      <div className="flex min-w-0 flex-1 flex-col p-4 sm:p-5">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+          <span className="inline-flex min-w-0 max-w-full items-center gap-1 break-words rounded-md bg-primary-light px-2 py-1 text-xs font-bold text-primary [overflow-wrap:anywhere]">
             {request.category?.icon || '📦'} {request.category?.name || '—'}
           </span>
-          <span className="text-xs text-ink-subtle">
+          <span className="shrink-0 text-xs text-ink-subtle">
             {relativeDate(request.createdAt)}
           </span>
         </div>
 
-        <h3 className="text-base font-bold text-ink leading-snug mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+        <h3 className="mb-2 break-words text-base font-bold leading-snug text-ink transition-colors group-hover:text-primary [overflow-wrap:anywhere]">
           {request.title}
         </h3>
 
-        <p className="text-xs text-ink-subtle mb-2">
-          Posted by {request.author?.name || 'Anonymous'}
-        </p>
+        <div className="mb-3">
+          {isOwnRequest ? (
+            <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary">
+              You posted
+            </span>
+          ) : (
+            <p className="break-words text-xs text-ink-subtle">
+              Posted by {request.author?.name || 'Anonymous'}
+            </p>
+          )}
+        </div>
 
-        <p className="text-sm text-ink-muted leading-relaxed line-clamp-2 mb-3">
+        <p className="mb-4 break-words text-sm leading-relaxed text-ink-muted [overflow-wrap:anywhere] line-clamp-3">
           {request.description}
         </p>
 
-        <div className="flex items-center justify-between text-xs">
-          <span className="font-bold text-ink">
+        <div className="mt-auto flex min-w-0 flex-wrap items-center justify-between gap-2 border-t border-border/70 pt-3">
+          <span className="min-w-0 max-w-full break-words text-sm font-bold text-ink [overflow-wrap:anywhere]">
             {formatBudget(request.budgetMin, request.budgetMax)}
           </span>
+          <span className="inline-flex shrink-0 items-center rounded-full bg-primary-light px-2.5 py-1 text-xs font-bold text-primary">
+            {replyCount} {replyCount === 1 ? 'reply' : 'replies'}
+          </span>
           {request.location && (
-            <span className="text-ink-muted">📍 {request.location}</span>
+            <span className="w-full break-words text-xs text-ink-muted [overflow-wrap:anywhere]">
+              📍 {request.location}
+            </span>
           )}
         </div>
       </div>

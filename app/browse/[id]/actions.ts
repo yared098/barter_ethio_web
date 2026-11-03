@@ -9,6 +9,9 @@ import { getAccessToken } from '@/lib/auth';
 const acceptPath = (requestId: string, replyId: string) =>
   `/requests/${requestId}/replies/${replyId}/accept`;
 
+const rejectPath = (requestId: string, replyId: string) =>
+  `/requests/${requestId}/replies/${replyId}/reject`;
+
 const withdrawPath = (requestId: string, replyId: string) =>
   `/requests/${requestId}/replies/${replyId}`;
 
@@ -36,6 +39,24 @@ export async function acceptReplyAction(requestId: string, replyId: string) {
   revalidatePath('/dashboard');
 
   if (offerId) redirect(`/chat/${offerId}`);
+}
+
+export async function rejectReplyAction(requestId: string, replyId: string) {
+  const token = await getAccessToken();
+  if (!token) throw new Error('Sign in to reject a reply');
+
+  try {
+    await apiFetch(rejectPath(requestId, replyId), {
+      method: 'POST',
+      token,
+    });
+  } catch (e: unknown) {
+    if (e instanceof ApiError) throw new Error(e.message);
+    throw e;
+  }
+
+  revalidatePath(`/browse/${requestId}`);
+  revalidatePath('/browse');
 }
 
 export async function withdrawReplyAction(requestId: string, replyId: string) {

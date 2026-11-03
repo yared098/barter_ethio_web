@@ -62,14 +62,16 @@ export default async function RequestDetailPage({ params }: Params) {
   const responses = request.responses ?? [];
   const status = request.status ?? 'OPEN';
   const user = token ? await getCurrentUser() : null;
+  const authorId = request.authorId || request.author?.id;
   const isAuthor =
-    request.isAuthor ??
-    Boolean(user && user.id === (request.authorId || request.author?.id));
+    request.isAuthor === true || Boolean(user && user.id === authorId);
   const canRespond =
-    request.canRespond ??
-    (!isAuthor && status === 'OPEN' && responses.length === 0);
+    !isAuthor &&
+    (request.canRespond ?? (status === 'OPEN' && responses.length === 0));
   const canAccept =
-    request.canAccept ?? (isAuthor && status === 'OPEN' && responses.length > 0);
+    isAuthor &&
+    status === 'OPEN' &&
+    responses.some((reply) => reply.status === 'PENDING');
   const restricted =
     request.isLocationRestricted === true || request.latitude != null;
   const hasValidRequestLocation =
@@ -227,7 +229,7 @@ export default async function RequestDetailPage({ params }: Params) {
             <section>
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-lg font-black text-ink">
-                  {canAccept
+                  {responses.some((reply) => reply.status === 'PENDING')
                     ? 'Pick the best offer'
                     : `Replies (${responses.length})`}
                 </h2>
@@ -386,10 +388,10 @@ function ReplyTile({
           <p className="text-sm font-bold text-ink truncate">
             {reply.responder?.name || 'Anonymous'}
           </p>
-            <p className="text-[11px] text-ink-subtle">
-              Replied {new Date(reply.createdAt).toLocaleString()}
-            </p>
-            {reply.product && (
+          <p className="text-[11px] text-ink-subtle">
+            Replied {new Date(reply.createdAt).toLocaleString()}
+          </p>
+          {reply.product && (
             <p className="text-xs text-ink-muted">
               Offers: {reply.product.title}
             </p>
@@ -406,7 +408,9 @@ function ReplyTile({
               className={`inline-block mt-1 text-[10px] font-bold px-1.5 py-0.5 rounded ${
                 isAccepted
                   ? 'bg-green-100 text-green-800'
-                  : 'bg-gray-100 text-gray-600'
+                  : reply.status === 'REJECTED'
+                    ? 'bg-red-100 text-red-700'
+                    : 'bg-gray-100 text-gray-600'
               }`}
             >
               {reply.status}
@@ -424,6 +428,7 @@ function ReplyTile({
           requestId={requestId}
           replyId={reply.id}
           isAuthor={isAuthor}
+          canAccept={canAccept}
         />
       )}
     </div>

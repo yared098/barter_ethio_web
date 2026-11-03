@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { apiFetch, RequestList } from '@/lib/api';
-import { getAccessToken } from '@/lib/auth';
+import { getAccessToken, getCurrentUser } from '@/lib/auth';
 import { RequestCard } from '@/components/request-card';
 
 export const metadata = {
@@ -19,6 +19,7 @@ export default async function BrowsePage({
   const page = parseInt(sp.page || '1', 10);
   const categoryId = sp.categoryId;
   const token = await getAccessToken();
+  const user = token ? await getCurrentUser() : null;
 
   const qs = new URLSearchParams({
     scope: 'all',
@@ -99,9 +100,13 @@ export default async function BrowsePage({
 
         {data && data.items.length > 0 && (
           <>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3 xl:grid-cols-4">
               {data.items.map((r) => (
-                <RequestCard key={r.id} request={r} />
+                <RequestCard
+                  key={r.id}
+                  request={r}
+                  currentUserId={user?.id}
+                />
               ))}
             </div>
 
