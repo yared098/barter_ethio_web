@@ -44,7 +44,7 @@ export default async function MyProductsPage({
       : products.filter((p) => p.status === tab.toUpperCase());
 
   return (
-    <main className="min-h-screen bg-[#f6f8fa]">
+    <main className="min-h-screen bg-slate-50">
       <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/70">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link

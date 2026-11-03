@@ -40,7 +40,7 @@ export default async function EditProductPage({ params }: Params) {
   if (product.ownerId !== user.id) redirect('/products');
   if (product.status !== 'AVAILABLE') {
     return (
-      <main className="min-h-screen bg-[#f6f8fa] flex items-center justify-center px-6">
+      <main className="min-h-screen bg-slate-50 flex items-center justify-center px-6">
         <div className="bg-white border border-slate-200 rounded-2xl p-8 max-w-md text-center">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-50 mb-4 text-3xl">
             ⚠️
@@ -63,7 +63,7 @@ export default async function EditProductPage({ params }: Params) {
   }
 
   return (
-    <main className="min-h-screen bg-[#f6f8fa]">
+    <main className="min-h-screen bg-slate-50">
       <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/70">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link

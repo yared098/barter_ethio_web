@@ -12,10 +12,9 @@ import { UserAvatar } from './user-avatar';
 type Props = {
   offer: ChatOffer;
   meId: string;
-  box: 'incoming' | 'outgoing';
 };
 
-export function ChatListItem({ offer, meId, box }: Props) {
+export function ChatListItem({ offer, meId }: Props) {
   const other = otherParty(offer, meId);
   const product = subjectProduct(offer, meId);
   const preview = offer.message?.trim() || 'No message';

@@ -15,14 +15,6 @@ type Props = {
 export function ChatList({ incoming, outgoing, meId }: Props) {
   const [search, setSearch] = useState('');
 
-  // Which box each offer came from — ChatListItem expects 'incoming' | 'outgoing'
-  const boxById = useMemo(() => {
-    const m = new Map<string, 'incoming' | 'outgoing'>();
-    incoming.forEach((o) => m.set(o.id, 'incoming'));
-    outgoing.forEach((o) => m.set(o.id, 'outgoing'));
-    return m;
-  }, [incoming, outgoing]);
-
   // Merge both into one list, newest activity on top
   const merged = useMemo(() => {
     const all = [...incoming, ...outgoing];
@@ -99,7 +91,7 @@ export function ChatList({ incoming, outgoing, meId }: Props) {
             placeholder="Search chats"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 bg-[#f0f5f2] rounded-xl text-sm text-ink outline-none focus:bg-white focus:ring-2 focus:ring-primary/20 transition placeholder:text-ink-subtle"
+            className="w-full pl-10 pr-4 py-2 bg-slate-100 rounded-xl text-sm text-ink outline-none focus:bg-white focus:ring-2 focus:ring-primary/20 transition placeholder:text-ink-subtle"
           />
           {search && (
             <button
@@ -143,7 +135,6 @@ export function ChatList({ incoming, outgoing, meId }: Props) {
               key={offer.id}
               offer={offer}
               meId={meId}
-              box={boxById.get(offer.id) ?? 'incoming'}
             />
           ))}
         </div>

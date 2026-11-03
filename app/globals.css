@@ -8,6 +8,67 @@
   --primary: #00a86b;
   --primary-dark: #007a4d;
   --ink: #0b3d2e;
+  --color-slate-50: 248 250 252;
+  --color-slate-100: 241 245 249;
+  --color-slate-200: 226 232 240;
+  --color-slate-300: 203 213 225;
+  --color-slate-400: 148 163 184;
+  --color-slate-500: 100 116 139;
+  --color-slate-600: 71 85 105;
+  --color-slate-700: 51 65 85;
+  --color-slate-800: 30 41 59;
+  --color-slate-900: 15 23 42;
+  --color-slate-950: 2 6 23;
+  --color-primary-light: 232 245 238;
+  --color-primary-mid: 184 229 204;
+  --color-ink: 11 61 46;
+  --color-ink-muted: 90 122 107;
+  --color-ink-subtle: 155 176 165;
+  --color-border: 212 232 221;
+  --color-divider: 235 243 239;
+  --page-background: 255 255 255;
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --color-slate-50: 15 23 42;
+  --color-slate-100: 30 41 59;
+  --color-slate-200: 51 65 85;
+  --color-slate-300: 71 85 105;
+  --color-slate-400: 100 116 139;
+  --color-slate-500: 148 163 184;
+  --color-slate-600: 203 213 225;
+  --color-slate-700: 226 232 240;
+  --color-slate-800: 241 245 249;
+  --color-slate-900: 248 250 252;
+  --color-slate-950: 255 255 255;
+  --color-primary-light: 19 55 42;
+  --color-primary-mid: 27 95 69;
+  --color-ink: 226 232 240;
+  --color-ink-muted: 148 163 184;
+  --color-ink-subtle: 100 116 139;
+  --color-border: 51 65 85;
+  --color-divider: 30 41 59;
+  --page-background: 15 23 42;
+  --ink: #e2e8f0;
+  color-scheme: dark;
+}
+
+:root[data-theme='dark'] .bg-white {
+  background-color: rgb(15 23 42);
+}
+
+:root[data-theme='dark'] [class~='bg-white/80'] {
+  background-color: rgb(15 23 42 / 0.9);
+}
+
+:root[data-theme='dark'] [class~='bg-white/90'],
+:root[data-theme='dark'] [class~='bg-white/95'] {
+  background-color: rgb(30 41 59 / 0.95);
+}
+
+:root[data-theme='dark'] .border-white {
+  border-color: rgb(51 65 85);
 }
 
 html {
@@ -18,8 +79,8 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-family: 'Inter', system-ui, sans-serif;
-  color: var(--ink);
-  background: #fff;
+  color: rgb(var(--color-ink));
+  background: rgb(var(--page-background));
 }
 
 .dot-grid {

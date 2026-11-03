@@ -124,8 +124,8 @@ export default async function DashboardPage({
   return (
     <main className="min-h-screen bg-slate-50">
       {/* ═══════════ TOP NAV ═══════════ */}
-      <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/60">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+      <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-slate-200/60">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-3">
           <Link href="/" className="flex items-center gap-2.5 shrink-0">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center shadow-md shadow-emerald-500/20">
               <span className="text-white font-black text-lg">B</span>
@@ -149,66 +149,95 @@ export default async function DashboardPage({
             <SignOutButton />
           </div>
         </div>
+        <div className="md:hidden border-t border-slate-100">
+          <div className="max-w-7xl mx-auto px-4 py-2 flex gap-2 overflow-x-auto no-scrollbar">
+            <MobileNavLink href="/products" icon={<IconBox size={15} />}>
+              My listings
+            </MobileNavLink>
+            <MobileNavLink href="/matches" icon={<IconTarget size={15} />}>
+              Matches
+            </MobileNavLink>
+            <MobileNavLink href="/browse" icon={<IconCompass size={15} />}>
+              Browse
+            </MobileNavLink>
+            <MobileNavLink
+              href="/chat"
+              icon={<IconMessage size={15} />}
+              badge={pendingIncoming}
+            >
+              Chats
+            </MobileNavLink>
+          </div>
+        </div>
       </nav>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 sm:py-8 pb-24">
         {upgraded && <DashboardSuccessBanner />}
 
-        {/* ═══════════ HERO — lighter, cleaner ═══════════ */}
-        <section className="mb-10">
-          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-5">
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-3 flex-wrap">
-                <TierBadge mode={status.mode} />
-                <span className="text-xs text-slate-400">·</span>
-                <span className="text-xs font-medium text-slate-500">
-                  {greetingLine(status)}
-                </span>
+        <section className="relative isolate overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-700 via-emerald-800 to-slate-950 text-white shadow-xl shadow-emerald-950/10 mb-7 sm:mb-9">
+          <div aria-hidden="true" className="absolute -right-16 -top-28 h-72 w-72 rounded-full bg-emerald-400/20 blur-3xl" />
+          <div aria-hidden="true" className="absolute -bottom-36 left-1/3 h-72 w-72 rounded-full bg-teal-300/10 blur-3xl" />
+          <div className="relative p-5 sm:p-8 lg:p-10">
+            <div className="flex flex-col xl:flex-row xl:items-end xl:justify-between gap-6">
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2 mb-4">
+                  <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-emerald-100/80">
+                    Your barter workspace
+                  </span>
+                  <TierBadge mode={status.mode} />
+                </div>
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-[1.08]">
+                  Welcome back, {firstName}
+                </h1>
+                <p className="mt-3 max-w-xl text-sm sm:text-base leading-relaxed text-emerald-50/85">
+                  Find the right trade, manage your listings, and keep every
+                  conversation moving from one place.
+                </p>
+                <div className="mt-5 inline-flex max-w-full items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-medium text-emerald-50">
+                  <span className={`h-2 w-2 shrink-0 rounded-full ${status.canPost ? 'bg-emerald-300' : 'bg-amber-300'}`} />
+                  <span className="truncate">{greetingLine(status)}</span>
+                </div>
               </div>
 
-              <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight leading-tight">
-                Welcome back, {firstName}
-              </h1>
-
-              <div className="grid grid-cols-3 gap-3 mt-6 max-w-md">
-                <StatCard
-                  icon={<IconTarget />}
-                  label="Matches"
-                  value={matchesCount}
-                  highlight={matchesCount > 0}
-                  href="/matches"
-                />
-                <StatCard
-                  icon={<IconMessage />}
-                  label="Pending"
-                  value={pendingIncoming}
-                  highlight={pendingIncoming > 0}
-                  href="/chat"
-                />
-                <StatCard
-                  icon={<IconBox />}
-                  label="Listings"
-                  value={availableProducts.length}
-                  href="/products"
-                />
+              <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap xl:justify-end">
+                <Link
+                  href="/post"
+                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 text-sm font-bold text-emerald-800 shadow-sm transition hover:bg-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-emerald-800"
+                >
+                  <IconPlus />
+                  Post a request
+                </Link>
+                <Link
+                  href="/product/new"
+                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-white/25 bg-white/10 px-4 py-3 text-sm font-bold text-white transition hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                >
+                  <IconBox />
+                  Add a product
+                </Link>
               </div>
             </div>
 
-            <div className="flex flex-row lg:flex-col gap-2 w-full lg:w-auto">
-              <Link
-                href="/post"
-                className="flex-1 lg:flex-initial inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-5 py-3 rounded-xl transition shadow-sm hover:shadow-md active:scale-[0.98]"
-              >
-                <IconPlus />
-                Post request
-              </Link>
-              <Link
+            <div className="mt-7 grid grid-cols-3 gap-2.5 sm:mt-8 sm:max-w-2xl sm:gap-3">
+              <StatCard
+                icon={<IconTarget />}
+                label="Matches"
+                value={matchesCount}
+                highlight={matchesCount > 0}
+                href="/matches"
+              />
+              <StatCard
+                icon={<IconMessage />}
+                label="New offers"
+                value={pendingIncoming}
+                highlight={pendingIncoming > 0}
+                href="/chat"
+              />
+              <StatCard
+                icon={<IconBox />}
+                label="Active listings"
+                value={availableProducts.length}
                 href="/products"
-                className="flex-1 lg:flex-initial inline-flex items-center justify-center gap-2 bg-white border border-slate-200 hover:border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold px-5 py-3 rounded-xl transition active:scale-[0.98]"
-              >
-                <IconBox />
-                My products
-              </Link>
+              />
             </div>
           </div>
         </section>
@@ -220,12 +249,12 @@ export default async function DashboardPage({
         />
 
         {/* ═══════════ STATUS + ACCOUNT ═══════════ */}
-        <div className="grid lg:grid-cols-3 gap-5 mb-10">
+        <div className="grid lg:grid-cols-3 gap-4 sm:gap-5 mb-8 sm:mb-10">
           <div className="lg:col-span-2">
             <PostingStatusPanel status={status} />
           </div>
 
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm">
+          <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
             <div className="px-5 pt-5 pb-4 flex items-center justify-between">
               <div>
                 <h2 className="text-sm font-bold text-slate-900">Account</h2>
@@ -441,7 +470,7 @@ export default async function DashboardPage({
         </Section>
 
         {/* ═══════════ QUICK ACTIONS ═══════════ */}
-        <section>
+        <section className="mb-4">
           <div className="flex items-center gap-2 mb-4">
             <h2 className="text-sm font-bold text-slate-900">Quick actions</h2>
             <div className="flex-1 h-px bg-slate-200" />
@@ -519,7 +548,7 @@ function Section({
   return (
     <section className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-10">
       <div className="px-5 sm:px-6 pt-5 pb-4">
-        <div className="flex items-center justify-between gap-2 mb-3">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
           <div className="flex items-center gap-2.5 min-w-0">
             <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center shrink-0 text-slate-600">
               {icon}
@@ -534,7 +563,11 @@ function Section({
             )}
             {badge}
           </div>
-          {actions && <div className="flex items-center gap-3 shrink-0">{actions}</div>}
+          {actions && (
+            <div className="flex items-center gap-3 self-end sm:self-auto shrink-0">
+              {actions}
+            </div>
+          )}
         </div>
 
         {tabs && tabs.length > 0 && (
@@ -571,21 +604,53 @@ function StatCard({
   return (
     <Link
       href={href}
-      className="group bg-white border border-slate-200 rounded-xl p-3 hover:border-slate-300 hover:shadow-sm transition"
+      className="group min-w-0 rounded-2xl border border-white/15 bg-white/10 p-2.5 sm:p-3 transition hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
     >
       <div
-        className={`w-7 h-7 rounded-lg flex items-center justify-center mb-2 ${
-          highlight ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-500'
+        className={`mb-2 flex h-7 w-7 items-center justify-center rounded-lg ${
+          highlight ? 'bg-white text-emerald-700' : 'bg-white/15 text-emerald-50'
         }`}
       >
         {icon}
       </div>
-      <div className="text-lg font-black text-slate-900 tabular-nums leading-tight">
+      <div className="text-xl sm:text-2xl font-black text-white tabular-nums leading-tight">
         {value}
       </div>
-      <div className="text-[10px] font-medium text-slate-500 uppercase tracking-wider">
-        {label}
+      <div className="mt-0.5 flex items-center justify-between gap-1">
+        <span className="truncate text-[9px] sm:text-[10px] font-semibold uppercase tracking-wide text-emerald-50/80">
+          {label}
+        </span>
+        <span aria-hidden="true" className="text-emerald-50/60 transition group-hover:translate-x-0.5">
+          →
+        </span>
       </div>
+    </Link>
+  );
+}
+
+function MobileNavLink({
+  href,
+  icon,
+  badge,
+  children,
+}: {
+  href: string;
+  icon: React.ReactNode;
+  badge?: number;
+  children: React.ReactNode;
+}) {
+  return (
+    <Link
+      href={href}
+      className="relative inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-600 transition hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-800"
+    >
+      {icon}
+      {children}
+      {badge != null && badge > 0 && (
+        <span className="min-w-4 rounded-full bg-red-500 px-1 text-center text-[9px] font-bold leading-4 text-white">
+          {badge > 9 ? '9+' : badge}
+        </span>
+      )}
     </Link>
   );
 }
@@ -656,8 +721,8 @@ function ProductMiniCard({ product }: { product: Product }) {
   return (
     <div>
       <Link
-        href="/products"
-        title="View all your products"
+        href={`/product/${product.id}`}
+        title={`View ${product.title}`}
         className="group block bg-white border border-slate-200 rounded-xl p-3 hover:border-emerald-300 hover:shadow-md transition-all"
       >
         <div className="flex gap-3">

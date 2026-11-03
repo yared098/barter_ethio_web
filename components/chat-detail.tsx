@@ -307,7 +307,7 @@ export function ChatDetail({ initialOffer, meId }: Props) {
   };
 
   return (
-    <div className="flex flex-col h-[100dvh] bg-gradient-to-b from-[#fafbfc] to-[#f2f5f7]">
+    <div className="flex flex-col h-[100dvh] bg-gradient-to-b from-slate-50 to-slate-100">
       {/* ═══════════ HEADER ═══════════ */}
       <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
         <div className="max-w-3xl mx-auto px-2 sm:px-3 h-16 flex items-center gap-2.5">
