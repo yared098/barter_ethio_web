@@ -1,0 +1,6 @@
+.next/
+node_modules/
+deploy/
+*.zip
+barter-deploy.zip
+.env*.local

@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00A86B"/>
+      <stop offset="100%" stop-color="#007A4D"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="20%" cy="20%" r="60%">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+
+  <!-- Logo tile -->
+  <rect x="80" y="80" width="120" height="120" rx="28" fill="#FFFFFF"/>
+  <text x="140" y="180"
+        font-family="Inter, system-ui, sans-serif"
+        font-size="82" font-weight="900"
+        fill="#00A86B" text-anchor="middle"
+        letter-spacing="-4">B</text>
+
+  <!-- Wordmark -->
+  <text x="80" y="310"
+        font-family="Inter, system-ui, sans-serif"
+        font-size="72" font-weight="800"
+        fill="#FFFFFF" letter-spacing="-2">Barter Ethio</text>
+
+  <!-- Tagline -->
+  <text x="80" y="380"
+        font-family="Inter, system-ui, sans-serif"
+        font-size="34" font-weight="500"
+        fill="#FFFFFF" fill-opacity="0.85">Trade what you have</text>
+  <text x="80" y="430"
+        font-family="Inter, system-ui, sans-serif"
+        font-size="34" font-weight="500"
+        fill="#FFFFFF" fill-opacity="0.85">for what you actually want.</text>
+
+  <!-- Country tag -->
+  <text x="80" y="560"
+        font-family="Inter, system-ui, sans-serif"
+        font-size="24" font-weight="700"
+        fill="#FFFFFF" fill-opacity="0.7">ethiopia · 🇪🇹</text>
+
+  <!-- Right decoration -->
+  <circle cx="1000" cy="200" r="120" fill="#FFFFFF" fill-opacity="0.08"/>
+  <circle cx="1060" cy="500" r="80" fill="#FFFFFF" fill-opacity="0.05"/>
+</svg>
