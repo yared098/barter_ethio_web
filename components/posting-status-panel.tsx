@@ -81,7 +81,7 @@ export function PostingStatusPanel({ status }: Props) {
       {status.mode === 'FREE' && (
         <Link
           href="/upgrade"
-          className="mt-5 w-full bg-primary hover:bg-primary-dark text-white font-bold py-3 rounded-full text-center block transition"
+          className="mt-5 block min-h-11 w-full rounded-xl bg-primary-dark py-3 text-center font-bold text-white transition hover:bg-emerald-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
         >
           Upgrade for more posts
         </Link>

@@ -11,7 +11,7 @@ type Product = {
   title: string;
   description: string;
   images: string[];
-  condition: string;
+  condition: 'NEW' | 'LIKE_NEW' | 'GOOD' | 'FAIR' | 'POOR';
   estimatedValue: number;
   categoryId: string;
   status: string;

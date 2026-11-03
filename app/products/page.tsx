@@ -55,7 +55,7 @@ export default async function MyProductsPage({
           </Link>
           <Link
             href="/product/new"
-            className="inline-flex items-center gap-1.5 bg-primary hover:bg-primary-dark text-white font-bold text-sm px-4 py-2 rounded-full transition"
+            className="inline-flex min-h-11 items-center gap-1.5 rounded-full bg-primary-dark px-4 py-2 text-sm font-bold text-white transition hover:bg-emerald-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
           >
             + New product
           </Link>
@@ -70,21 +70,26 @@ export default async function MyProductsPage({
           Everything you&apos;ve listed. Delete or edit anytime while available.
         </p>
 
-        <div className="flex items-center gap-1.5 mb-5 overflow-x-auto no-scrollbar">
+        <div
+          role="group"
+          aria-label="Filter products by status"
+          className="mb-5 grid grid-cols-2 gap-1 rounded-xl bg-slate-100 p-1 sm:grid-cols-4"
+        >
           {(['all', 'available', 'pending', 'swapped'] as const).map((t) => (
             <Link
               key={t}
               href={`/products${t === 'all' ? '' : `?tab=${t}`}`}
-              className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition ${
+              aria-current={tab === t ? 'page' : undefined}
+              className={`inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg px-3 text-xs font-bold whitespace-nowrap transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 ${
                 tab === t
-                  ? 'bg-primary text-white shadow-sm'
-                  : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+                  ? 'bg-primary-dark text-white shadow-sm'
+                  : 'text-slate-700 hover:bg-white'
               }`}
             >
               {t[0].toUpperCase() + t.slice(1)}
               <span
                 className={`text-[10px] font-black px-1.5 py-0.5 rounded-full tabular-nums ${
-                  tab === t ? 'bg-white/25' : 'bg-slate-100 text-slate-700'
+                  tab === t ? 'bg-white/20 text-white' : 'bg-white text-slate-700'
                 }`}
               >
                 {counts[t]}
@@ -111,7 +116,7 @@ export default async function MyProductsPage({
             </p>
             <Link
               href="/product/new"
-              className="inline-block bg-primary hover:bg-primary-dark text-white font-bold px-5 py-2.5 rounded-full text-sm transition"
+              className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary-dark px-5 py-2.5 text-sm font-bold text-white transition hover:bg-emerald-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
             >
               List your first product
             </Link>

@@ -6,12 +6,13 @@ import Link from 'next/link';
 import { updateProductAction } from '@/app/products/actions';
 
 type Category = { id: string; name: string; icon: string | null; slug: string };
+type Condition = 'NEW' | 'LIKE_NEW' | 'GOOD' | 'FAIR' | 'POOR';
 
 type Product = {
   id: string;
   title: string;
   description: string;
-  condition: string;
+  condition: Condition;
   estimatedValue: number;
   categoryId: string;
 };
@@ -63,7 +64,7 @@ export function EditProductForm({
         await updateProductAction(product.id, {
           title: title.trim(),
           description: description.trim(),
-          condition: condition as any,
+          condition,
           estimatedValue: value,
           categoryId,
         });
@@ -139,7 +140,12 @@ export function EditProductForm({
           </label>
           <select
             value={condition}
-            onChange={(e) => setCondition(e.target.value)}
+            onChange={(e) => {
+              const selected = CONDITIONS.find(
+                (item) => item.value === e.currentTarget.value,
+              );
+              if (selected) setCondition(selected.value);
+            }}
             disabled={pending}
             className="w-full border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition disabled:opacity-60"
           >
@@ -205,7 +211,7 @@ export function EditProductForm({
         <button
           type="submit"
           disabled={pending}
-          className="flex-1 bg-primary hover:bg-primary-dark text-white font-bold py-2.5 rounded-xl text-sm transition disabled:opacity-60 inline-flex items-center justify-center gap-1.5"
+          className="flex-1 bg-primary-dark hover:bg-emerald-800 text-white font-bold py-2.5 rounded-xl text-sm transition disabled:opacity-60 inline-flex items-center justify-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
         >
           {pending ? (
             <>

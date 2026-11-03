@@ -161,7 +161,7 @@ export default async function DashboardPage({
           telegramUsername={user.telegramUsername}
         />
 
-        <section className="relative isolate overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-700 via-emerald-800 to-slate-950 text-white shadow-xl shadow-emerald-950/10 mb-7 sm:mb-9">
+        <section className="relative isolate overflow-hidden rounded-2xl bg-gradient-to-br from-emerald-700 via-emerald-800 to-slate-950 text-white shadow-xl shadow-emerald-950/10 mb-7 sm:mb-9">
           <div aria-hidden="true" className="absolute -right-16 -top-28 h-72 w-72 rounded-full bg-emerald-400/20 blur-3xl" />
           <div aria-hidden="true" className="absolute -bottom-36 left-1/3 h-72 w-72 rounded-full bg-teal-300/10 blur-3xl" />
           <div className="relative p-5 sm:p-8 lg:p-10">
@@ -186,17 +186,17 @@ export default async function DashboardPage({
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap xl:justify-end">
+              <div className="grid grid-cols-1 min-[380px]:grid-cols-2 gap-2 sm:flex sm:flex-wrap xl:justify-end">
                 <Link
                   href="/post"
-                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-white px-4 py-3 text-sm font-bold text-emerald-800 shadow-sm transition hover:bg-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-emerald-800"
+                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-white px-3 sm:px-4 py-3 text-xs sm:text-sm font-bold text-emerald-900 shadow-sm transition hover:bg-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-emerald-800"
                 >
                   <IconPlus />
                   Post a request
                 </Link>
                 <Link
                   href="/product/new"
-                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-white/25 bg-white/10 px-4 py-3 text-sm font-bold text-white transition hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                  className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-white/30 bg-slate-950/30 px-3 sm:px-4 py-3 text-xs sm:text-sm font-bold text-white transition hover:bg-slate-950/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
                 >
                   <IconBox />
                   Add a product
@@ -310,7 +310,7 @@ export default async function DashboardPage({
               )}
               <Link
                 href="/product/new"
-                className="inline-flex items-center gap-1 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs px-3 py-1.5 rounded-lg transition whitespace-nowrap"
+                className="inline-flex min-h-10 items-center justify-center gap-1 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs px-3 py-2 rounded-lg transition whitespace-nowrap"
               >
                 <IconPlus size={12} />
                 New
@@ -534,8 +534,8 @@ function Section({
 }) {
   return (
     <section className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-10">
-      <div className="px-5 sm:px-6 pt-5 pb-4">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
+      <div className="px-4 sm:px-6 pt-4 sm:pt-5 pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="flex items-center gap-2.5 min-w-0">
             <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center shrink-0 text-slate-600">
               {icon}
@@ -551,14 +551,14 @@ function Section({
             {badge}
           </div>
           {actions && (
-            <div className="flex items-center gap-3 self-end sm:self-auto shrink-0">
+            <div className="flex items-center justify-end gap-3 shrink-0">
               {actions}
             </div>
           )}
         </div>
 
         {tabs && tabs.length > 0 && (
-          <div className="flex items-center gap-1 -mb-1 overflow-x-auto no-scrollbar">
+          <div className="mt-4 grid grid-cols-3 gap-1 rounded-xl bg-slate-100 p-1">
             {tabs.map((t) => (
               <TabLink key={t.label} {...t} />
             ))}
@@ -619,10 +619,10 @@ function TabLink({ href, active, label, count }: Tab) {
   return (
     <Link
       href={href}
-      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition ${
+      className={`inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg px-2 sm:px-3 text-xs font-semibold whitespace-nowrap transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-1 ${
         active
-          ? 'bg-slate-900 text-white'
-          : 'text-slate-600 hover:bg-slate-100'
+          ? 'bg-primary-dark text-white shadow-sm'
+          : 'text-slate-700 hover:bg-white'
       }`}
     >
       {label}
@@ -679,11 +679,11 @@ function ProductMiniCard({ product }: { product: Product }) {
         : 'bg-slate-100 text-slate-600 border-slate-200';
 
   return (
-    <div>
+    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white transition hover:border-emerald-300 hover:shadow-md">
       <Link
         href={`/product/${product.id}`}
         title={`View ${product.title}`}
-        className="group block bg-white border border-slate-200 rounded-xl p-3 hover:border-emerald-300 hover:shadow-md transition-all"
+        className="group block p-3"
       >
         <div className="flex gap-3">
           {image ? (
@@ -722,6 +722,26 @@ function ProductMiniCard({ product }: { product: Product }) {
           </div>
         </div>
       </Link>
+      <div className="flex gap-2 px-3 pb-3">
+        {product.status === 'AVAILABLE' ? (
+          <Link
+            href={`/product/${product.id}/edit`}
+            className="inline-flex min-h-10 flex-1 items-center justify-center rounded-lg bg-primary-dark px-3 text-xs font-bold text-white transition hover:bg-emerald-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+          >
+            Edit
+          </Link>
+        ) : (
+          <span className="inline-flex min-h-10 flex-1 items-center justify-center rounded-lg bg-slate-100 px-3 text-xs font-semibold text-slate-500">
+            {product.status === 'PENDING' ? 'In a deal' : 'Swapped'}
+          </span>
+        )}
+        <Link
+          href="/products"
+          className="inline-flex min-h-10 flex-1 items-center justify-center rounded-lg border border-slate-200 bg-white px-3 text-xs font-bold text-slate-700 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+        >
+          Manage
+        </Link>
+      </div>
     </div>
   );
 }

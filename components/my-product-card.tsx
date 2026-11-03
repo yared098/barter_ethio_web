@@ -151,7 +151,7 @@ export function MyProductCard({ product }: { product: MyProduct }) {
               <>
                 <Link
                   href={`/product/${product.id}/edit`}
-                  className="flex-1 text-center bg-primary hover:bg-primary-dark text-white font-bold text-xs py-2 rounded-lg transition"
+                  className="flex-1 text-center bg-primary-dark hover:bg-emerald-800 text-white font-bold text-xs py-2.5 rounded-lg transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
                 >
                   Edit
                 </Link>
