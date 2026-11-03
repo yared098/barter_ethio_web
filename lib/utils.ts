@@ -23,6 +23,8 @@ export function relativeDate(iso: string): string {
 export function resolveImage(path: string | null | undefined): string | null {
   if (!path) return null;
   if (path.startsWith('http://') || path.startsWith('https://')) return path;
-  const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://api.smrestaurant.com';
-  return `${base.replace(/\/$/, '')}${path.startsWith('/') ? '' : '/'}${path}`;
+  const siteUrl =
+    process.env.NEXT_PUBLIC_SITE_URL || 'https://api.smrestaurant.com';
+  const baseUrl = new URL(siteUrl).origin;
+  return new URL(path, `${baseUrl}/`).toString();
 }

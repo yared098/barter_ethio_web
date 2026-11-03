@@ -12,6 +12,7 @@ import {
 } from '@/lib/chat';
 import { UserAvatar } from './user-avatar';
 import { MessageBubble } from './message-bubble';
+import { resolveImage } from '@/lib/utils';
 
 type Props = {
   initialOffer: ChatOffer;
@@ -89,6 +90,7 @@ export function ChatDetail({ initialOffer, meId }: Props) {
 
   const other = otherParty(offer, meId);
   const product = subjectProduct(offer, meId);
+  const productImage = resolveImage(product?.images?.[0]);
   const canMessage = !['COMPLETED', 'CANCELLED', 'DECLINED'].includes(
     offer.status,
   );
@@ -369,10 +371,10 @@ export function ChatDetail({ initialOffer, meId }: Props) {
             className="block border-t border-slate-200/60 hover:bg-slate-50/80 transition"
           >
             <div className="max-w-3xl mx-auto px-3 sm:px-4 py-2.5 flex items-center gap-3">
-              {product.images?.[0] ? (
+              {productImage ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
-                  src={product.images[0]}
+                  src={productImage}
                   alt={product.title}
                   className="w-10 h-10 rounded-lg object-cover flex-shrink-0 ring-1 ring-slate-200"
                 />

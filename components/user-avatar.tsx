@@ -1,4 +1,5 @@
 import { initials } from '@/lib/chat';
+import { resolveImage } from '@/lib/utils';
 
 type Props = {
   name: string | null;
@@ -12,7 +13,7 @@ export function UserAvatar({ name, image, size = 40 }: Props) {
   if (image) {
     return (
       <img
-        src={image}
+        src={resolveImage(image) ?? ''}
         alt={name ?? 'User'}
         style={style}
         className="rounded-full object-cover bg-primary-light flex-shrink-0"

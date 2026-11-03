@@ -33,11 +33,11 @@ export default async function BrowsePage({
 
   try {
     data = await apiFetch<RequestList>(`/requests?${qs}`, { token });
-  } catch (e: any) {
+  } catch (e: unknown) {
     if (e instanceof ApiError && e.status === 401) {
       needsAuth = true;
     } else {
-      errorMsg = e?.message || 'Could not load board';
+      errorMsg = e instanceof Error ? e.message : 'Could not load board';
     }
   }
 
@@ -73,7 +73,7 @@ export default async function BrowsePage({
         </div>
       </nav>
 
-      <div className="max-w-6xl mx-auto px-6 py-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
         <div className="mb-8">
           <h1 className="text-3xl font-black text-ink mb-2">Wanted board</h1>
           <p className="text-ink-muted">What people are looking for right now.</p>
@@ -119,7 +119,7 @@ export default async function BrowsePage({
 
         {data && data.items.length > 0 && (
           <>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {data.items.map((r) => (
                 <RequestCard key={r.id} request={r} />
               ))}

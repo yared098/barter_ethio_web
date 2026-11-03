@@ -97,6 +97,22 @@ export type CreateRequestPayload = {
   latitude?: number;
   longitude?: number;
   isLocationRestricted?: boolean;
+}; 
+export type MyProduct = {
+  id: string;
+  title: string;
+  description: string;
+  images: string[];
+  estimatedValue: number;
+  condition: string;
+  status: 'AVAILABLE' | 'PENDING' | 'SWAPPED';
+  createdAt: string;
+  category?: { id: string; name: string; icon: string | null; slug: string };
+  wants?: Array<{
+    categoryId: string;
+    keywords: string | null;
+    category?: { id: string; name: string; icon: string | null };
+  }>;
 };
 
 export type ReplyStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED' | 'WITHDRAWN';

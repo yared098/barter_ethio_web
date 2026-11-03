@@ -2,11 +2,20 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { apiFetch, Request, Reply } from '@/lib/api';
 import { getAccessToken } from '@/lib/auth';
-import { formatBudget, relativeDate } from '@/lib/utils';
+import { formatBudget, relativeDate, resolveImage } from '@/lib/utils';
 import { ReplyForm } from '@/components/reply-form';
 import { ReplyActions } from '@/components/reply-actions';
 
 type Params = { params: Promise<{ id: string }> };
+
+type RequestDetails = Request & {
+  responses?: Reply[];
+  isAuthor?: boolean;
+  canRespond?: boolean;
+  canAccept?: boolean;
+  myOfferId?: string | null;
+  specifications?: Record<string, unknown>;
+};
 
 export const dynamic = 'force-dynamic';
 
@@ -28,10 +37,10 @@ export default async function RequestDetailPage({ params }: Params) {
   const { id } = await params;
   const token = await getAccessToken();
 
-  let request: Request | null = null;
+  let request: RequestDetails | null = null;
   let needsAuth = false;
   try {
-    request = await apiFetch<Request>(`/requests/${id}`, { token });
+    request = await apiFetch<RequestDetails>(`/requests/${id}`, { token });
   } catch (e: unknown) {
     const status = (e as { status?: number })?.status;
     if (status === 404) notFound();
@@ -79,6 +88,9 @@ export default async function RequestDetailPage({ params }: Params) {
   const canAccept = request.canAccept === true;
   const myOfferId = request.myOfferId ?? null;
   const images = Array.isArray(request.images) ? request.images : [];
+  const resolvedImages = images
+    .map((image) => resolveImage(image))
+    .filter((image): image is string => image !== null);
   const specs = request.specifications ?? {};
 
   return (
@@ -128,9 +140,9 @@ export default async function RequestDetailPage({ params }: Params) {
           </p>
         )}
 
-        {images.length > 0 && (
+        {resolvedImages.length > 0 && (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
-            {images.map((src, i) => (
+            {resolvedImages.map((src, i) => (
               <a
                 key={`${src}-${i}`}
                 href={src}

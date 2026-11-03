@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { resolveImage } from '@/lib/utils';
 
 type Product = {
   id: string;
@@ -129,6 +130,7 @@ export function OfferForm({
         <div className="space-y-2">
           {myProducts.map((p) => {
             const active = offeredProductId === p.id;
+            const image = resolveImage(p.images?.[0]);
             return (
               <button
                 key={p.id}
@@ -141,10 +143,10 @@ export function OfferForm({
                     : 'border-border hover:border-primary/40'
                 }`}
               >
-                {p.images?.[0] ? (
+                {image ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
-                    src={p.images[0]}
+                    src={image}
                     alt={p.title}
                     className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
                   />

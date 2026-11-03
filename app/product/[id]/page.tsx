@@ -3,6 +3,7 @@ import { notFound, redirect } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
 import { getCurrentUser } from '@/lib/auth';
 import { OfferForm } from '@/components/offer-form';
+import { resolveImage } from '@/lib/utils';
 
 type Product = {
   id: string;
@@ -79,7 +80,7 @@ export default async function ProductDetailPage({ params }: Params) {
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={img}
+                  src={resolveImage(img) ?? ''}
                   alt={`${product.title} — ${i + 1}`}
                   className="w-full h-full object-cover"
                 />
