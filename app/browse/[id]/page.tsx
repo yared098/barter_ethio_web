@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { apiFetch, Request, Reply } from '@/lib/api';
-import { getAccessToken } from '@/lib/auth';
+import { getAccessToken, getCurrentUser } from '@/lib/auth';
 import { formatBudget, relativeDate, resolveImage } from '@/lib/utils';
 import { ReplyForm } from '@/components/reply-form';
 import { ReplyActions } from '@/components/reply-actions';
@@ -61,9 +61,24 @@ export default async function RequestDetailPage({ params }: Params) {
 
   const responses = request.responses ?? [];
   const status = request.status ?? 'OPEN';
-  const isAuthor = request.isAuthor === true;
-  const canRespond = request.canRespond === true;
-  const canAccept = request.canAccept === true;
+  const user = token ? await getCurrentUser() : null;
+  const isAuthor =
+    request.isAuthor ??
+    Boolean(user && user.id === (request.authorId || request.author?.id));
+  const canRespond =
+    request.canRespond ??
+    (!isAuthor && status === 'OPEN' && responses.length === 0);
+  const canAccept =
+    request.canAccept ?? (isAuthor && status === 'OPEN' && responses.length > 0);
+  const restricted =
+    request.isLocationRestricted === true || request.latitude != null;
+  const hasValidRequestLocation =
+    request.latitude != null &&
+    request.longitude != null &&
+    Number.isFinite(request.latitude) &&
+    Number.isFinite(request.longitude) &&
+    Math.abs(request.latitude) <= 90 &&
+    Math.abs(request.longitude) <= 180;
   const myOfferId = request.myOfferId ?? null;
   const images = Array.isArray(request.images) ? request.images : [];
   const resolvedImages = images
@@ -173,14 +188,19 @@ export default async function RequestDetailPage({ params }: Params) {
               </div>
             </div>
           )}
-          {request.location && (
+          {(request.location || restricted) && (
             <div className="bg-primary-light/40 rounded-xl p-4">
               <div className="text-xs font-bold text-ink-muted uppercase tracking-wider mb-1">
                 Location
               </div>
               <div className="text-lg font-black text-ink">
-                📍 {request.location}
+                📍 {request.location || 'Shared location'}
               </div>
+              {restricted && (
+                <p className="mt-1 text-xs text-ink-muted">
+                  Replies are limited to people within 50 km.
+                </p>
+              )}
             </div>
           )}
         </div>
@@ -272,12 +292,22 @@ export default async function RequestDetailPage({ params }: Params) {
                     Sign in to reply
                   </Link>
                 </div>
+              ) : canRespond && restricted && !hasValidRequestLocation ? (
+                <p className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+                  Replies are limited to people within 50 km, but this request
+                  does not have a valid location to check.
+                </p>
               ) : canRespond ? (
                 <>
                   <h2 className="text-lg font-black text-ink mb-3">
                     Respond to this request
                   </h2>
-                  <ReplyForm requestId={request.id} />
+                  <ReplyForm
+                    requestId={request.id}
+                    restricted={restricted}
+                    requestLatitude={request.latitude}
+                    requestLongitude={request.longitude}
+                  />
                 </>
               ) : responses.length > 0 ? (
                 <>
@@ -356,7 +386,10 @@ function ReplyTile({
           <p className="text-sm font-bold text-ink truncate">
             {reply.responder?.name || 'Anonymous'}
           </p>
-          {reply.product && (
+            <p className="text-[11px] text-ink-subtle">
+              Replied {new Date(reply.createdAt).toLocaleString()}
+            </p>
+            {reply.product && (
             <p className="text-xs text-ink-muted">
               Offers: {reply.product.title}
             </p>

@@ -123,9 +123,9 @@ export function CreateRequestForm() {
       if (min != null) body.budgetMin = min;
       if (max != null) body.budgetMax = max;
       if (locationName.trim()) body.location = locationName.trim();
-      if (latitude != null) body.latitude = latitude;
-      if (longitude != null) body.longitude = longitude;
       if (locationRestricted && latitude != null) {
+        body.latitude = latitude;
+        body.longitude = longitude;
         body.isLocationRestricted = true;
       }
       if (imageUrls.length > 0) body.images = imageUrls;
@@ -354,7 +354,7 @@ export function CreateRequestForm() {
                   Only allow replies from nearby
                 </div>
                 <div className="text-[10px] text-ink-muted leading-relaxed">
-                  People more than ~50 km away will not be able to reply.
+                  People more than 50 km away will not be able to reply.
                   Perfect for pickup-only items.
                 </div>
               </div>
