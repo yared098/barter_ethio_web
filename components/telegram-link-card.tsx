@@ -21,7 +21,7 @@ function messageFrom(body: LinkCodeResponse): string {
 }
 
 export function TelegramLinkCard({ linked, telegramUsername }: Props) {
-  const [isLinked, setIsLinked] = useState(linked);
+  const [isLinked] = useState(linked);
   const [code, setCode] = useState<string | null>(null);
   const [expiresAt, setExpiresAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -40,10 +40,6 @@ export function TelegramLinkCard({ linked, telegramUsername }: Props) {
       });
       const body = (await response.json().catch(() => ({}))) as LinkCodeResponse;
       if (!response.ok) throw new Error(messageFrom(body));
-      if (body.linked) {
-        setIsLinked(true);
-        return;
-      }
       if (!body.code || !body.expiresAt) {
         throw new Error('The server returned an invalid Telegram link code.');
       }
@@ -69,7 +65,8 @@ export function TelegramLinkCard({ linked, telegramUsername }: Props) {
             <p className="mt-1 text-sm text-slate-600">
               Your Barter Ethio account is linked
               {telegramUsername ? ` to @${telegramUsername}` : ''}. Telegram
-              chat notifications can open conversations directly.
+              chat notifications can open conversations directly. Generate a
+              fresh code after logging out of the bot if you need to reconnect.
             </p>
           ) : (
             <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-600">
@@ -78,16 +75,18 @@ export function TelegramLinkCard({ linked, telegramUsername }: Props) {
             </p>
           )}
         </div>
-        {!isLinked && (
-          <button
-            type="button"
-            onClick={createCode}
-            disabled={loading}
-            className="shrink-0 rounded-full bg-sky-700 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-sky-800 disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {loading ? 'Creating code…' : 'Link Telegram'}
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={createCode}
+          disabled={loading}
+          className="shrink-0 rounded-full bg-sky-700 px-5 py-2.5 text-sm font-bold text-white transition hover:bg-sky-800 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {loading
+            ? 'Creating code…'
+            : isLinked
+              ? 'Reconnect Telegram'
+              : 'Link Telegram'}
+        </button>
       </div>
 
       {code && expiresAt && (
