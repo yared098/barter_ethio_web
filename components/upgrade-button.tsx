@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { QRCodeSVG } from 'qrcode.react';
 import type { InitPaymentResponse, PaymentStatusResponse } from '@/lib/payments';
 
 type Props = {
@@ -25,6 +26,7 @@ export function UpgradeButton({
   const [phase, setPhase] = useState<Phase>('idle');
   const [error, setError] = useState<string | null>(null);
   const [payment, setPayment] = useState<InitPaymentResponse | null>(null);
+  const [secondsLeft, setSecondsLeft] = useState<number | null>(null);
   const pollRef = useRef<number | null>(null);
   const timeoutRef = useRef<number | null>(null);
 
@@ -34,6 +36,27 @@ export function UpgradeButton({
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
   }, []);
+
+  useEffect(() => {
+    if (phase !== 'waiting' || !payment) return;
+
+    const updateCountdown = () => {
+      const expiresAt = Date.parse(payment.expiresAt);
+      if (!Number.isFinite(expiresAt)) return;
+
+      const remaining = Math.max(0, Math.ceil((expiresAt - Date.now()) / 1000));
+      setSecondsLeft(remaining);
+      if (remaining === 0) {
+        if (pollRef.current) clearInterval(pollRef.current);
+        setError('Payment QR expired — choose the plan again to get a new one.');
+        setPhase('failed');
+      }
+    };
+
+    updateCountdown();
+    const interval = window.setInterval(updateCountdown, 1000);
+    return () => window.clearInterval(interval);
+  }, [phase, payment]);
 
   const handleClick = async () => {
     if (!isAuthenticated) {
@@ -62,12 +85,11 @@ export function UpgradeButton({
 
       const data = (await res.json()) as InitPaymentResponse;
       setPayment(data);
-
-      window.open(data.checkoutUrl, '_blank', 'noopener,noreferrer');
+      setSecondsLeft(null);
       setPhase('waiting');
       startPolling(data.paymentId);
-    } catch (e: any) {
-      setError(e?.message || 'Failed to start payment');
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Failed to start payment');
       setPhase('failed');
     }
   };
@@ -160,24 +182,58 @@ export function UpgradeButton({
       <div className="space-y-2">
         <div className="bg-primary-light rounded-xl p-3 text-center">
           <div className="text-xs font-bold text-primary mb-1">
-            {phase === 'initializing' ? 'Starting checkout…' : 'Waiting for payment…'}
+            {phase === 'initializing'
+              ? 'Preparing payment…'
+              : 'Payment ready'}
           </div>
           {phase === 'waiting' && (
             <>
-              <div className="text-[10px] text-ink-muted mb-2">
-                Complete the payment in the new tab
-              </div>
+              {payment?.checkoutUrl && (
+                <div className="mt-3 rounded-xl border border-border bg-white p-4">
+                  <p className="mb-3 text-sm font-bold text-ink">
+                    Scan to pay with another device
+                  </p>
+                  <div className="mx-auto w-fit rounded-lg bg-white p-2">
+                    <QRCodeSVG
+                      value={payment.checkoutUrl}
+                      size={192}
+                      level="M"
+                      marginSize={2}
+                      aria-label="QR code for secure payment checkout"
+                    />
+                  </div>
+                  <p className="mt-3 text-xs leading-relaxed text-ink-muted">
+                    Scan this code with another device to open secure checkout.
+                  </p>
+                </div>
+              )}
+              <p className="mb-3 mt-3 text-xs font-semibold text-ink-muted">
+                QR expires in{' '}
+                {secondsLeft == null
+                  ? '…'
+                  : `${Math.floor(secondsLeft / 60)
+                      .toString()
+                      .padStart(2, '0')}:${(secondsLeft % 60)
+                      .toString()
+                      .padStart(2, '0')}`}
+              </p>
               <button
+                type="button"
                 onClick={reopenCheckout}
-                className="text-[10px] font-bold text-primary underline"
+                disabled={!payment?.checkoutUrl}
+                className="w-full rounded-full bg-primary px-4 py-2.5 text-sm font-bold text-white transition hover:bg-primary-dark disabled:opacity-50"
               >
-                Reopen checkout
+                Pay by Chapa
               </button>
             </>
           )}
         </div>
         {phase === 'waiting' && (
-          <button onClick={cancel} className="w-full text-xs text-ink-muted hover:text-ink py-1">
+          <button
+            type="button"
+            onClick={cancel}
+            className="w-full py-1 text-xs text-ink-muted hover:text-ink"
+          >
             Cancel
           </button>
         )}

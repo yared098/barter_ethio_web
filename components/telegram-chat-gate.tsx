@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
 import type { ChatOffer } from '@/lib/chat';
 import { ChatDetail } from './chat-detail';
 
@@ -116,12 +115,12 @@ export function TelegramChatGate({ offerId }: Props) {
             : error}
         </p>
         {!loading && error && (
-          <Link
-            href={`/auth/login?next=/chat/${encodeURIComponent(offerId)}`}
-            className="mt-5 inline-flex rounded-full bg-primary px-5 py-2.5 text-sm font-bold text-white"
-          >
-            Continue on the website
-          </Link>
+          <p className="mt-4 text-xs leading-5 text-slate-500">
+            If this Telegram account is not linked yet, sign in to Barter Ethio
+            on the website, create a link code from your dashboard, and send
+            <code className="mx-1 rounded bg-slate-100 px-1">/link CODE</code>
+            to the bot. Then reopen this chat notification.
+          </p>
         )}
       </section>
     </main>

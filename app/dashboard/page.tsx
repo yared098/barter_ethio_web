@@ -18,6 +18,8 @@ import { DashboardMatchesSection } from '@/components/dashboard-matches-section'
 import { SignOutButton } from '@/components/sign-out-button';
 import { UserAvatar } from '@/components/user-avatar';
 import { resolveImage } from '@/lib/utils';
+import { MobilePrimaryNav } from '@/components/mobile-primary-nav';
+import { TelegramLinkCard } from '@/components/telegram-link-card';
 
 export const metadata = { title: 'Dashboard' };
 
@@ -149,30 +151,15 @@ export default async function DashboardPage({
             <SignOutButton />
           </div>
         </div>
-        <div className="md:hidden border-t border-slate-100">
-          <div className="max-w-7xl mx-auto px-4 py-2 flex gap-2 overflow-x-auto no-scrollbar">
-            <MobileNavLink href="/products" icon={<IconBox size={15} />}>
-              My listings
-            </MobileNavLink>
-            <MobileNavLink href="/matches" icon={<IconTarget size={15} />}>
-              Matches
-            </MobileNavLink>
-            <MobileNavLink href="/browse" icon={<IconCompass size={15} />}>
-              Browse
-            </MobileNavLink>
-            <MobileNavLink
-              href="/chat"
-              icon={<IconMessage size={15} />}
-              badge={pendingIncoming}
-            >
-              Chats
-            </MobileNavLink>
-          </div>
-        </div>
+        <MobilePrimaryNav active="home" pendingChats={pendingIncoming} />
       </nav>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 sm:py-8 pb-24">
         {upgraded && <DashboardSuccessBanner />}
+        <TelegramLinkCard
+          linked={Boolean(user.telegramChatId)}
+          telegramUsername={user.telegramUsername}
+        />
 
         <section className="relative isolate overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-700 via-emerald-800 to-slate-950 text-white shadow-xl shadow-emerald-950/10 mb-7 sm:mb-9">
           <div aria-hidden="true" className="absolute -right-16 -top-28 h-72 w-72 rounded-full bg-emerald-400/20 blur-3xl" />
@@ -624,33 +611,6 @@ function StatCard({
           →
         </span>
       </div>
-    </Link>
-  );
-}
-
-function MobileNavLink({
-  href,
-  icon,
-  badge,
-  children,
-}: {
-  href: string;
-  icon: React.ReactNode;
-  badge?: number;
-  children: React.ReactNode;
-}) {
-  return (
-    <Link
-      href={href}
-      className="relative inline-flex min-h-10 shrink-0 items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-600 transition hover:border-emerald-200 hover:bg-emerald-50 hover:text-emerald-800"
-    >
-      {icon}
-      {children}
-      {badge != null && badge > 0 && (
-        <span className="min-w-4 rounded-full bg-red-500 px-1 text-center text-[9px] font-bold leading-4 text-white">
-          {badge > 9 ? '9+' : badge}
-        </span>
-      )}
     </Link>
   );
 }
