@@ -18,9 +18,11 @@ export async function apiFetch<T = any>(
   options: RequestInit & { token?: string | null } = {},
 ): Promise<T> {
   const { token, headers, ...rest } = options;
+  const isFormData =
+    typeof FormData !== 'undefined' && rest.body instanceof FormData;
 
   const finalHeaders: Record<string, string> = {
-    'Content-Type': 'application/json',
+    ...(!isFormData && { 'Content-Type': 'application/json' }),
     ...(headers as Record<string, string>),
   };
   if (token) finalHeaders.Authorization = `Bearer ${token}`;

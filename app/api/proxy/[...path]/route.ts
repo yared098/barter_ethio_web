@@ -33,9 +33,11 @@ async function handler(
   const apiPath = '/' + path.join('/');
   const search = req.nextUrl.search || '';
 
-  let body: string | undefined;
+  let body: BodyInit | undefined;
   if (req.method !== 'GET' && req.method !== 'HEAD') {
-    body = await req.text();
+    body = req.headers.get('content-type')?.includes('multipart/form-data')
+      ? await req.formData()
+      : await req.text();
   }
 
   try {

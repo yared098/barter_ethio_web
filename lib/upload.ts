@@ -1,9 +1,9 @@
-/** Upload one file via /api/upload. Returns the URL. */
+/** Upload one file via the app's /upload route. Returns the URL. */
 export async function uploadImage(file: File): Promise<string> {
   const form = new FormData();
   form.append('file', file);
 
-  const res = await fetch('/api/upload', {
+  const res = await fetch('/upload', {
     method: 'POST',
     body: form,
   });

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { uploadImages } from '@/lib/upload';
 import { ImagePicker } from './image-picker';
 
 type Category = { id: string; name: string; icon: string | null };
@@ -28,7 +27,6 @@ export function CreateRequestForm() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loadingCats, setLoadingCats] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState('');
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -103,44 +101,34 @@ export function CreateRequestForm() {
 
     setSubmitting(true);
     try {
-      // 1. upload images
-      let imageUrls: string[] = [];
-      if (images.length > 0) {
-        setUploadProgress(`Uploading ${images.length} image(s)…`);
-        imageUrls = await uploadImages(images, (done, total) => {
-          setUploadProgress(`Uploading ${done}/${total}…`);
-        });
-        setUploadProgress('');
-      }
-
-      // 2. create request
-      const body: Record<string, any> = {
-        title: title.trim(),
-        description: description.trim(),
-        categoryId,
-        type,
-      };
-      if (min != null) body.budgetMin = min;
-      if (max != null) body.budgetMax = max;
-      if (locationName.trim()) body.location = locationName.trim();
+      const body = new FormData();
+      body.append('title', title.trim());
+      body.append('description', description.trim());
+      body.append('categoryId', categoryId);
+      body.append('type', type);
+      if (min != null) body.append('budgetMin', String(min));
+      if (max != null) body.append('budgetMax', String(max));
+      if (locationName.trim()) body.append('location', locationName.trim());
       if (locationRestricted && latitude != null) {
-        body.latitude = latitude;
-        body.longitude = longitude;
-        body.isLocationRestricted = true;
+        body.append('latitude', String(latitude));
+        body.append('longitude', String(longitude));
+        body.append('isLocationRestricted', 'true');
       }
-      if (imageUrls.length > 0) body.images = imageUrls;
+      for (const image of images) {
+        body.append('images', image, image.name);
+      }
 
       const res = await fetch('/api/proxy/requests', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
+        body,
       });
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         const msg =
-          err?.message?.toString?.() ||
-          err?.message?.[0] ||
+          (Array.isArray(err?.message)
+            ? err.message.join(', ')
+            : err?.message?.toString?.()) ||
           'Could not post request';
         throw new Error(msg);
       }
@@ -152,7 +140,6 @@ export function CreateRequestForm() {
       setError(e?.message || 'Something went wrong');
     } finally {
       setSubmitting(false);
-      setUploadProgress('');
     }
   };
 
@@ -200,8 +187,10 @@ export function CreateRequestForm() {
           Photos (optional)
         </label>
         <ImagePicker images={images} onChange={setImages} maxImages={5} />
-        {uploadProgress && (
-          <p className="text-xs text-primary mt-2">{uploadProgress}</p>
+        {submitting && images.length > 0 && (
+          <p className="text-xs text-primary mt-2">
+            Uploading {images.length} photo(s) with your request…
+          </p>
         )}
       </div>
 
